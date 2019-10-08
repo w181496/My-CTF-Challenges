@@ -1,12 +1,12 @@
 # Balsn CTF 2019 
 
-## Warmup
+# Warmup
 
 - Difficulty: ★★
 - Solved: 5 / 720
 - Tag: PHP, SSRF, MySQL, Windows
 
-### Description
+## Description
 
 Baby PHP challenge again.
 
@@ -15,16 +15,16 @@ Baby PHP challenge again.
 [Link](http://warmup.balsnctf.com)
 
 
-### Source Code
+## Source Code
 
 - [Warmup](https://github.com/w181496/My-CTF-Challenges/blob/master/Balsn-CTF-2019/Warmup/index.php)
 
-### Solution
+## Solution
 
 This challenge consists of many simple and old PHP/Windows tricks.
 
 
-#### Step 1
+### Step 1
 
 In this challenge, you should refactor the code first. 
 
@@ -100,7 +100,7 @@ After refactoring, you will get the clean code like this:
 
 <br>
 
-#### Step 2
+### Step 2
 
 Let's try to read the `config.php`
 
@@ -250,7 +250,7 @@ It is equal to `getenv("HTTP_T")`.
 
 <br>
 
-### Step 4
+## Step 4
 
 Now, you have a blind SSRF!
 
@@ -268,14 +268,14 @@ At last, you just need to use Time-based or Out-of-band (DNS log) methods to exf
 
 ---
 
-## 卍乂Oo韓國魚oO乂卍 (Koreanfish)
+# 卍乂Oo韓國魚oO乂卍 (Koreanfish)
 
 
 - Difficulty: ★
 - Solved: 15 / 720
 - Tag: PHP, DNS Rebinding, Flask, Race condition, SSTI, RCE
 
-### Description
+## Description
 
 Taiwanese people love korean fish.
 
@@ -283,17 +283,17 @@ Taiwanese people love korean fish.
 
 [Download](https://static.balsnctf.com/koreafish/d68fcc656a04423422ff162d9793606f2c5068904fced9087edc28efc411e7b7/koreafish-src.zip)
 
-### Source Code
+## Source Code
 
 - [Koreanfish](https://github.com/w181496/My-CTF-Challenges/blob/master/Balsn-CTF-2019/Koreanfish/)
 
-### Solution
+## Solution
 
 This is a whitebox challenge, and all the source code are very short and simple :D
 
 <br>
 
-#### Step 1
+### Step 1
 
 If you look at the source code of `index.php`, you will know the first target is to bypass IP limit.
 
@@ -321,7 +321,7 @@ e.g. `36573657.7f000001.rbndr.us` will return `54.87.54.87` or `127.0.0.1`.
 
 <br>
 
-#### Step 2
+### Step 2
 
 From the dockerfile, we know there is a simple flask app running on the same server.
 
@@ -367,7 +367,7 @@ So you can just use `//korea/error_page?err=....` to bypass the restriction.
 
 <br>
 
-#### Step 4
+### Step 4
 
 Now, we can control the path of the content that `render_template_string()` read.
 
@@ -381,7 +381,7 @@ If you provide the `PHP_SESSION_UPLOAD_PROGRESS` in the multipart POST data, PHP
 
 <br>
 
-#### Step 5
+### Step 5
 
 The default `session.upload_progress.cleanup` setting is `On`, so your SSTI payload will be cleaned quickly.
 
@@ -446,5 +446,5 @@ pool = ThreadPool(32)
 result = pool.map_async( runner, range(32) ).get(0xffff)
 ```
 
-
+For the detail of bypassing the SSTI sanitizing, you can read my cheatsheet: [Link](https://github.com/w181496/Web-CTF-Cheatsheet#flaskjinja2) 
 
