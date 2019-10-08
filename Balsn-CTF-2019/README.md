@@ -23,13 +23,12 @@ Baby PHP challenge again.
 
 This challenge consists of many simple and old PHP/Windows tricks.
 
-<br>
 
 #### Step 1
 
 In this challenge, you should refactor the code first. 
 
-(Bacause the source code is so ugly and hard to read :p)
+(Because the source code is so ugly and hard to read :p)
 
 After refactoring, you will get the clean code like this:
 
@@ -126,11 +125,11 @@ The argument of the `$_GET` is `\xE2\x81\xA3`, it is an invisible character.
 
 <br>
 
-Our taget is to read `config.php`, but there are some check for our filename:
+Our target is to read `config.php`, but there is some check for our filename:
 
-We can't use the `.php`, `php.` suffix of filename and we can't use `"`, `>`, `<`, `amp`, `$`, `..` in the filename.
+We can't use the `.php`, `php.` filename suffix and we can't use `"`, `>`, `<`, `amp`, `$`, `..` in the filename.
 
-To bypass this restriction to read php source code, you just need to append a space character after the filename:
+To bypass this restriction to read the php source code, you just need to append a space character after the filename:
 
 `config.php[SPACE]`
 
@@ -156,7 +155,7 @@ Because the third argument of `file_get_contents()` is 155. (Read 155 Bytes only
 
 <br>
 
-We sholud use some special php wrapper to compress the content of `config.php`.
+We should use some special php wrapper to compress the content of `config.php`.
 
 And `php://filter/zlib.deflate` is your best friend!
 
@@ -192,7 +191,7 @@ Now you have the `config.php`:
 
 **Method 0x2**
 
-Many teams use the `eval()` of first branch to read `config.php`. 
+Many teams use the `eval()` of the first branch to read `config.php`. 
 
 In this `eval()` branch, your input `$_` will put into `eval("return $_;")`.
 
@@ -209,7 +208,7 @@ Example: `~urldecode("%8D%9A%9E%9B%99%96%93%9A")` is equal to `readfile`.
 
 <br>
 
-In the Windows, there are some **MAGIC** wildcard features for path normalization.
+In Windows, there are some **MAGIC** wildcard features for path normalization.
 
 Example: 
 
@@ -237,11 +236,11 @@ And we know the user is `admin` with empty password, so we can use `gopher://` p
 
 <br>
 
-But the gopher payload is toooooo long, we sholud find a way to bypass the strict regex rule first.
+But the gopher payload is toooooo long, we should find a way to bypass the strict regex rule first.
 
 If you try to search all PHP functions that satisfy the regex rule and length limit, you will find a useful function: `getenv()`.
 
-This function will return the specifying header vaule.
+This function will return the specifying header value.
 
 So we can put our gopher payload into the HTTP header.
 
@@ -286,17 +285,17 @@ Taiwanese people love korean fish.
 
 ### Source Code
 
-- [Warmup](https://github.com/w181496/My-CTF-Challenges/blob/master/Balsn-CTF-2019/Koreanfish/)
+- [Koreanfish](https://github.com/w181496/My-CTF-Challenges/blob/master/Balsn-CTF-2019/Koreanfish/)
 
 ### Solution
 
-This is a whitebox challenge, and all the source code are very short :D
+This is a whitebox challenge, and all the source code are very short and simple :D
 
 <br>
 
 #### Step 1
 
-If you look the source code of `index.php`, you will know the first target is to bypass IP limit.
+If you look at the source code of `index.php`, you will know the first target is to bypass IP limit.
 
 Actually, here is a obvious DNS Rebinding vulnerability that can bypass IP limit:
 
@@ -314,7 +313,9 @@ So if we set our domain's A record to `54.87.54.87` and `127.0.0.1`, it has some
 
 If you don't have any domain ... 
 
-Don't worry! You can use some online DNS Rebinding services like `rbndr.us`.
+Don't worry! 
+
+You can use some online DNS Rebinding services like `rbndr.us`.
 
 e.g. `36573657.7f000001.rbndr.us` will return `54.87.54.87` or `127.0.0.1`.
 
@@ -328,7 +329,7 @@ And there is a SSTI vulnerability on `/error_page` function, it uses `render_tem
 
 <br>
 
-If the `error_status` set to absolute path, then the `os.path.join()` return path will be overwrited.
+If the `error_status` set to absolute path, then the return path of `os.path.join()` will be overwrited.
 
 e.g. `os.path.join("/var/www/flask", "error", "/etc/passwd")` will return `/etc/passwd`
 
@@ -336,7 +337,7 @@ e.g. `os.path.join("/var/www/flask", "error", "/etc/passwd")` will return `/etc/
 
 But the problem here is that you can't directly touch this `/error_page`.
 
-Because the front-end php will check the query path, the path has to contain the string of `korea`.
+Because the front-end php will check the query path, the path has to contain the string of `korea`:
 
 `if(stripos($res['path'], "korea") === FALSE) die("Error");`
 
@@ -370,7 +371,7 @@ So you can just use `//korea/error_page?err=....` to bypass the restriction.
 
 Now, we can control the path of the content that `render_template_string()` read.
 
-But we should find a file that can be placed our controllable payload.
+But we should find a file that can be placed on our controllable payload.
 
 Because the server is running with PHP, so you can use the `session.upload_progress` trick to upload your SSTI payload to the session file.
 
@@ -382,9 +383,9 @@ If you provide the `PHP_SESSION_UPLOAD_PROGRESS` in the multipart POST data, PHP
 
 #### Step 5
 
-The default `session.upload_progress.cleanup` setting is `On`, so your uploaded payload will be cleaned.
+The default `session.upload_progress.cleanup` setting is `On`, so your SSTI payload will be cleaned quickly.
 
-Let's Race it!
+OK! Let's Race it!
 
 Exploit script:
 
