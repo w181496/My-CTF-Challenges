@@ -1,0 +1,7 @@
+version: '3'
+services:
+  koreafish: 
+    build: .
+    container_name: koreafish
+    ports:
+      - 5478:80
