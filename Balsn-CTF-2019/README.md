@@ -274,6 +274,8 @@ At last, you just need to use Time-based or Out-of-band (DNS log) methods to exf
 
 ---
 
+<br>
+
 # 卍乂Oo韓國魚oO乂卍 (Koreanfish)
 
 
@@ -336,7 +338,7 @@ And there is a obvious SSTI vulnerability on `/error_page` function, it uses `re
 
 <br>
 
-If the `error_status` set to absolute path, then the return path of `os.path.join()` will be overwrited.
+If the `error_status` set to absolute path, then the return path of `os.path.join()` will be overwritten.
 
 e.g. `os.path.join("/var/www/flask", "error", "/etc/passwd")` will return `/etc/passwd`
 
