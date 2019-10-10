@@ -221,7 +221,7 @@ Example:
 
 (more detail: [My-CTF-CheatSheet](https://github.com/w181496/Web-CTF-Cheatsheet#%E8%B7%AF%E5%BE%91%E6%AD%A3%E8%A6%8F%E5%8C%96))
 
-Finally, we can combine `~` trick and `<` trick to read the `config.php`:
+Combine the `~` trick and `<` trick together:
 
 `/?op=-9&Σ>―(%23°ω°%23)♡→=(~%8D%9A%9E%9B%99%96%93%9A)(~%9C%90%C3%C3)`
 
@@ -232,20 +232,18 @@ Finally, we can combine `~` trick and `<` trick to read the `config.php`:
 ### Step 3
 
 The content of `config.php` tells us that the flag is in the MySQL database.
-
-So our next target is to query MySQL Server and get the result.
+Our next target is to query MySQL Server and get the result.
 
 And we know the user is `admin` with empty password, so we can use `gopher://` protocol to  SSRF to query the MySQL Server.
 
 <br>
 
-But the gopher payload is toooooo long, we should find a way to bypass the strict regex rule first.
+Since the gopher payload is toooooo long, we should find a way to bypass the strict regex rule first.
 
 If you try to search all PHP functions that satisfy the regex rule and length limit, you will find a useful function: `getenv()`.
-
 This function will return the specifying header value.
 
-Hence, we can put our gopher payload into the HTTP header.
+Hence, we can put our gopher payload into the HTTP header:
 
 `(~%98%9A%8B%9A%91%89)(~%B7%AB%AB%AF%A0%AB)` (length: 18)
 
@@ -316,9 +314,9 @@ if($ip === $dev_ip) {
     $content = file_get_contents($dst);
 ```
 
-The `file_get_contents()` will query DNS again.
+The `file_get_contents()` will query DNS again and read the response.
 
-So if we set our domain's A record to `54.87.54.87` and `127.0.0.1`, it has some possibilities to bypass IP restriction to query internal services.
+If we set our domain's A record to `54.87.54.87` and `127.0.0.1`, it has some possibilities to bypass IP restriction to query internal services.
 
 If you don't have any domain ... 
 
@@ -334,7 +332,7 @@ e.g. `36573657.7f000001.rbndr.us` will return `54.87.54.87` or `127.0.0.1`.
 
 From the dockerfile, we know there is a simple flask app running on the same server.
 
-And there is a SSTI vulnerability on `/error_page` function, it uses `render_template_string()` with controllable content.
+And there is a obvious SSTI vulnerability on `/error_page` function, it uses `render_template_string()` with controllable content.
 
 <br>
 
@@ -352,7 +350,7 @@ Because the front-end php will check the query path, the path has to contain the
 
 <br>
 
-There are two ways that can bypass this restriction:
+There are two ways that can bypass this path restriction:
 
 <br>
 
@@ -362,7 +360,7 @@ You can use redirect!
 
 Using DNS Rebinding to your Server IP, Then set the path `/korea` to redirect to `127.0.0.1:5000/error_page?err=....`.
 
-Because the `file_get_contents()` will follow the 302 redirect.
+The reason is that `file_get_contents()` will follow the 302 redirect.
 
 <br>
 
@@ -380,9 +378,9 @@ Therefore, you can just use `//korea/error_page?err=....` to bypass the restrict
 
 Now, we can control the path of the content that `render_template_string()` read.
 
-But we should find a file that can be placed our controllable payload.
+You should find a file that can be placed our controllable payload.
 
-Because the server is running with PHP, so you can use the `session.upload_progress` trick to upload your SSTI payload to the session file.
+Because the server is running with PHP, you can use the `session.upload_progress` trick to upload your SSTI payload to the session file.
 
 If you provide the `PHP_SESSION_UPLOAD_PROGRESS` in the multipart POST data, PHP will enable the session for you.
 
@@ -457,6 +455,14 @@ pool = ThreadPool(32)
 result = pool.map_async( runner, range(32) ).get(0xffff)
 ```
 
+Have a cup of coffee, then you'll see the reverse shell back. :D
+
 For the detail of bypassing the SSTI sanitizing, you can read my cheatsheet: [Link](https://github.com/w181496/Web-CTF-Cheatsheet#flaskjinja2) 
 
 ## Writeups
+
+NULL
+
+---
+
+Hope you like these challenges. :p
