@@ -462,7 +462,7 @@ For the detail of bypassing the SSTI sanitizing, you can read my cheatsheet: [Li
 
 ## Writeups
 
-NULL
+- [tr1ple's writeup](https://www.cnblogs.com/tr1ple/p/11682014.html#xwrEKctS)
 
 ---
 
