@@ -161,10 +161,13 @@ Upload Image
 <br>
 
 
-> BTW
-> Actually, this is just a warmup challenge compared to other web challenge.
-> But some china teams said this challenge is too easy in the feedback.
-> Maybe I should prepare a more complex (or harder) warmup challenge next year XD? (flee
+BTW
+
+Actually, this is just a warmup challenge compared to other web challenge.
+
+But some china teams said this challenge is too easy in the feedback.
+
+Maybe I should prepare a more complex (or harder) warmup challenge next year XD? (flee
 
 
 ## Writeups
