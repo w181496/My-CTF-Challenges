@@ -24,6 +24,7 @@ Author: kaibro
 
 - [L5D](https://github.com/w181496/My-CTF-Challenges/blob/master/Balsn-CTF-2020/src/)
 
+Easter egg: My source code is just 420 line ;p
 
 ## Solution
 
