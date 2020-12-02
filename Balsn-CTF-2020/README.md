@@ -29,7 +29,7 @@ Easter egg: My source code is just 420 line ;p
 ## Solution
 
 
-In this challenge, there are 5 classes that contain some magic methods like `__construct`, `__destruct`.
+In this challenge, there are 5 classes that contain some magic methods like `__wakeup`, `__destruct`.
 
 And we have a arbitrary unserialize entry point:
 
@@ -95,9 +95,9 @@ So final exploit chain is:
 
 But there is still a small problem, lots of `__wakeup()` function will destroy your session or some important global variable in the process of unserialization. These variables will make your exploit failed.
 
-An easy way to control order of `__wakeup()` and `__destroy()` is to use the [Fast Destruct](https://github.com/ambionics/phpggc#fast-destruct) trick.
-It means that if you define two same key in an array, the first one object will be destroyed (it will call `__destroy()`) in the process of deserilization.
-So you don't need to wait until the program ends to call `__destroy()`.
+An easy way to control order of `__wakeup()` and `__destruct()` is to use the [Fast Destruct](https://github.com/ambionics/phpggc#fast-destruct) trick.
+It means that if you define two same key in an array, the first one object will be destroyed (it will call `__destruct()`) in the process of deserilization.
+So you don't need to wait until the program ends to call `__destruct()`.
 
 Finally, one of a valid exploit chain looks like this:
 
