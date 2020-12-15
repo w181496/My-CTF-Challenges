@@ -177,3 +177,5 @@ Maybe I should prepare a more complex (or harder) warmup challenge next year XD?
 ](https://github.com/TFNS/writeups/tree/master/2020-11-14-BalsnCTF/l5d)
 - [Super Gusser](https://github.com/Super-Guesser/ctf/tree/master/BalsnCTF2020/web/L5D)
 - [安全客](https://www.anquanke.com/post/id/222675#h2-1)
+- [RB363](https://blog.rb363.tw/2020/12/04/Balsn-CTF-2020-L5D/)
+- [10sec](https://hackmd.io/@raagi/ByGN2tk9P#Web--471---L5D)
