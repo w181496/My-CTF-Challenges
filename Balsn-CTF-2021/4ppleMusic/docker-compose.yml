@@ -1,0 +1,9 @@
+version: "3.0"
+services:
+  flagserver.local:
+    build: ./rmi
+    hostname: flagserver.local
+  front:
+    build: ./front
+    ports:
+      - "28880:80"

@@ -1,0 +1,31 @@
+<?xml version="1.0" encoding="UTF-8" standalone="no"?>
+<registration_data version="1.0">
+   <environment>
+      <hostname>itc-elvm2-rhel4-x86-64-01</hostname>
+      <hostId>a10a37cb</hostId>
+      <osName>Linux</osName>
+      <osVersion>2.6.9-42.EL</osVersion>
+      <osArchitecture>amd64</osArchitecture>
+      <systemModel>x86_64</systemModel>
+      <systemManufacturer/>
+      <cpuManufacturer>GenuineIntel</cpuManufacturer>
+      <serialNumber/>
+   </environment>
+   <registry urn="urn:st:685dae4b-82fc-4944-83bd-75cd8dde8f29" version="1.0">
+      <service_tag>
+         <instance_urn>urn:st:c22b2129-49da-498b-ba03-c424d78e27af</instance_urn>
+         <product_name>Java SE 6 Development Kit</product_name>
+         <product_version>1.6.0_16</product_version>
+         <product_urn>urn:uuid:b58ef9a8-5ae8-11db-a023-080020a9ed93</product_urn>
+         <product_parent_urn>urn:uuid:fdc90b21-018d-4cab-b866-612c7c119ed3</product_parent_urn>
+         <product_parent>Java Platform Standard Edition 6 (Java SE 6)</product_parent>
+         <product_defined_inst_id>id=1.6.0_16-b01 amd64,dir=/usr/jdk1.6.0_16/jre</product_defined_inst_id>
+         <product_vendor>Sun Microsystems</product_vendor>
+         <platform_arch>amd64</platform_arch>
+         <timestamp>2009-11-06 13:22:06 GMT</timestamp>
+         <container>global</container>
+         <source>jdk-6u16-fcs-bin-b01-linux-amd64-31_jul_2009.bin</source>
+         <installer_uid>-1</installer_uid>
+      </service_tag>
+   </registry>
+</registration_data>
