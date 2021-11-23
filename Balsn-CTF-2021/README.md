@@ -70,7 +70,7 @@ There are many open ports on `flagserver.local`, like `34571`, `34572`, ...
 
 If you visit http://flagserver.local:34572, you will see the following response:
 
-```
+```xml
 <OBJECT
     NAME = "%APPLICATION%"
     classid = "clsid:8AD9C840-044E-11D1-B3E9-00805F499D93"
@@ -120,7 +120,7 @@ So our target is to pwn this Adaptec Storage Manager server!
 
 If you [install Adaptec Storage Manager](https://adaptec.com/en-us/downloads/storage_manager/sm/productid=sas-3085&dn=adaptec+raid+3085.html) on your local machine or decompiling the RaidManS.jar, you will find that 34571 port is **RMI Registry** Service.
 
-Next, you can send RMI packet with `gopher://` to verify it:
+Next, you can send RMI header packet with `gopher://` to verify it:
 
 ```
 url=gopher://flagserver.local:34571/_JRMI%2500%02K%2500%2500%2500%2500%2500%2500
@@ -135,9 +135,9 @@ N
 
 Next step is to attack this RMI service and find the flag.
 
-Because this service is very old, so the jdk is very likely to be old too.
+Because this service is very old (the newest release date is `25 Aug 2010`), so the jdk is very likely to be old too.
 
-(In the old jdk version, if RMI can't find the class, it will try to load the class from the codebase.)
+(In the old jdk version (< 6u45/7u21), if RMI can't find the class, it will try to load the class from the codebase.)
 
 So we can try to attack the codebase, setting the codebase to our server:
 
