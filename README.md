@@ -2,8 +2,8 @@
 
 ## Balsn CTF 2021
 
-- [2linephp](https://github.com/w181496/My-CTF-Challenges/tree/master/Balsn-CTF-2021)
-- [4pple Music](https://github.com/w181496/My-CTF-Challenges/tree/master/Balsn-CTF-2021)
+- [2linephp](https://github.com/w181496/My-CTF-Challenges/tree/master/Balsn-CTF-2021#2linephp)
+- [4pple Music](https://github.com/w181496/My-CTF-Challenges/tree/master/Balsn-CTF-2021#4pple-music)
 
 ## 巅峰极客 2020
 
