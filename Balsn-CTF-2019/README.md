@@ -270,6 +270,7 @@ At last, you just need to use Time-based or Out-of-band (DNS log) methods to exf
 ## Writeups
 
 - [movrment's writeup](https://movrment.blogspot.com/2019/10/balsn-ctf-2019-web-warmup.html)
+- [ljdd520's writeup](https://ljdd520.github.io/2019/12/19/2019balsnCTF%E7%9A%84Warmup%E5%92%8Ckoreanfish%E8%B5%9B%E5%90%8E%E5%A4%8D%E7%8E%B0/)
 
 ---
 
@@ -463,7 +464,7 @@ For the detail of bypassing the SSTI sanitizing, you can read my cheatsheet: [Li
 ## Writeups
 
 - [tr1ple's writeup](https://www.cnblogs.com/tr1ple/p/11682014.html#xwrEKctS)
-
+- [ljdd520's writeup](https://ljdd520.github.io/2019/12/19/2019balsnCTF%E7%9A%84Warmup%E5%92%8Ckoreanfish%E8%B5%9B%E5%90%8E%E5%A4%8D%E7%8E%B0/)
 ---
 
 Hope you like these challenges. :p
