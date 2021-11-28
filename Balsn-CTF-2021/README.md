@@ -13,7 +13,7 @@
 
 ## Solution
 
-In 2020, I have made a similar challenge in a chinese CTF (巅峰极客2020 - MeowWorld).
+In 2020, I have made a similar challenge in a chinese CTF.
 
 But the difference is that we can't use http/https and our webshell should start with `<?php`.
 
@@ -37,7 +37,7 @@ There are many interesting unintended solutions :D
 
 ## Writeups
 
-- TBD
+- [maple3142's writeup](https://blog.maple3142.net/2021/11/21/balsn-ctf-2021-writeups/#linephp)
 
 ---
 
