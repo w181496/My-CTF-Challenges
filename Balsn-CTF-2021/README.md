@@ -38,6 +38,7 @@ There are many interesting unintended solutions :D
 ## Writeups
 
 - [maple3142's writeup](https://blog.maple3142.net/2021/11/21/balsn-ctf-2021-writeups/#linephp)
+- [HhhM's blog](https://redmango.top/article/69#2linephp)
 
 ---
 
@@ -161,4 +162,4 @@ Note: you should use correct jdk version to compile this malicious class, you ca
 (Actually, this is a realworld case reproduced. Maybe it is boring, but I think it is suitable for people to learn how to attack RMI in realworld.)
 
 ## Writeups
-- TBD
+- [HhhM's blog](https://redmango.top/article/69#4pple-music)
