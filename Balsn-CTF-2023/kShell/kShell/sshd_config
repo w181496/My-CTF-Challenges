@@ -1,0 +1,25 @@
+# /etc/ssh/sshd_config
+
+# Port to listen on (change to a non-default port)
+Port 22
+
+# Protocol 2 only (disable SSH protocol 1)
+Protocol 2
+
+# Allow only specific users to log in (replace 'username' with the allowed username)
+AllowUsers kShell
+
+# Disable root login (authentication by root user not allowed)
+PermitRootLogin no
+
+# Disable password-based authentication (use key-based authentication)
+PasswordAuthentication no
+
+# Allow public key authentication
+PubkeyAuthentication yes
+
+# Specify the location of authorized_keys file (default is ~/.ssh/authorized_keys)
+AuthorizedKeysFile      .ssh/authorized_keys
+
+# Disable TCP Forwarding
+AllowTcpForwarding no
